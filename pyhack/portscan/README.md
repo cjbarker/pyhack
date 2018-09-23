@@ -1,6 +1,6 @@
-# PY-SCAN
+# PortScan
 
-Py-scan is a multi-threaded port scanner that leverages [NMAP](https://nmap.org)
+PortScan is a Python module that provides multi-threaded port scanner leveraging [NMAP](https://nmap.org)
 
 ## Usage
 TBA
