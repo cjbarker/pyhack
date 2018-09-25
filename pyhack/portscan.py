@@ -4,13 +4,13 @@
 from __future__ import print_function
 from enum import Enum
 
-import nmap
 import sys
 import socket
+import nmap
 
 # Globals
-MIN_PORT=1
-MAX_PORT=65535
+MIN_PORT = 1
+MAX_PORT = 65535
 
 class ScanType(Enum):
     ALL       = 1
@@ -39,8 +39,8 @@ def fin_scan(host=None, port=0):
 def xmas_scan(host=None, port=0):
     pass
 
-def scan(scanType=ScanType.CONNECT, host=None, port=0):
-    if host == None or (port < MIN_PORT or port > MAX_PORT):
+def scan(scan_type=ScanType.CONNECT, host=None, port=0):
+    if host is None or (port < MIN_PORT or port > MAX_PORT):
         # TODO throw exception on ports?
         return
     # TODO convert host to IP
@@ -53,7 +53,7 @@ def scan(scanType=ScanType.CONNECT, host=None, port=0):
     return
 
 def valid_ip(ip=None):
-    if ip == None:
+    if ip is None:
         return False
     try:
         if ':' in ip:
