@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+from enum import Enum
 
 import nmap
 import sys
@@ -10,13 +11,46 @@ import socket
 # Globals
 MIN_PORT=1
 MAX_PORT=65535
-RE_IPV4=""
-RE_IPV6=""
 
-def nmap_scan(host=None, port=0):
-    if host == None or port == 0:
+class ScanType(Enum):
+    ALL       = 1
+    PING      = 2
+    HALF_OPEN = 3
+    CONNECT   = 4
+    NULL      = 5
+    FIN       = 6
+    XMAS      = 7
+
+def ping_scan(host=None, port=0):
+    pass
+
+def half_open_scan(host=None, port=0):
+    pass
+
+def connect_scan(host=None, port=0):
+    pass
+
+def null_scan(host=None, port=0):
+    pass
+
+def fin_scan(host=None, port=0):
+    pass
+
+def xmas_scan(host=None, port=0):
+    pass
+
+def scan(scanType=ScanType.CONNECT, host=None, port=0):
+    if host == None or (port < MIN_PORT or port > MAX_PORT):
+        # TODO throw exception on ports?
         return
-    #nmScan = nmapPortScanner()
+    # TODO convert host to IP
+    '''
+    nmScan = nmapPortScanner()
+    nmScan.scan(host, port)
+    state = nmScan[host]['tcp'][int(port)]['state']
+    print("[*] " + host + " tcp/" + port + " " + state)
+    '''
+    return
 
 def valid_ip(ip=None):
     if ip == None:
@@ -33,8 +67,7 @@ def valid_ip(ip=None):
         else:
             print('None of these ' + ip)
     except socket.error, e:
-        # TODO log?
-        pass
+        pass # TODO log?
 
     return False
 
