@@ -35,6 +35,14 @@ pipenv install pigar
 pipenv install nose2
 ```
 
+## Testing
+```bash
+# run specific test
+pipenv run nose2 -v tests.test_portscan
+
+# run all tests
+pipenv run nose2 
+```
 
 ## References
 * [NMAP](https://nmap.org/) network discovery and security auditing
