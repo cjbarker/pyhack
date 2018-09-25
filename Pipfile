@@ -7,6 +7,7 @@ name = "pypi"
 
 [packages]
 python-nmap = "==0.6.1"
+pylint = "*"
 
 [requires]
 python_version = "2.7"

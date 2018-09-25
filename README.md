@@ -31,8 +31,8 @@ python setup.py sdist
 ```bash
 pip install futures
 pip install --user pipenv
-pipenv install pigar
 pipenv install nose2
+pipenv install pylint
 ```
 
 ## Testing
@@ -42,6 +42,9 @@ pipenv run nose2 -v tests.test_portscan
 
 # run all tests
 pipenv run nose2 
+
+# linting
+pipenv run pylint pyhack -d C0326 --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
 ```
 
 ## References
