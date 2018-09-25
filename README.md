@@ -27,5 +27,14 @@ python setup.py sdist
 * [PORTSCAN](./pyhack/portscan): Multi-threaded port scanner leveraging [NMAP](https://nmap.org/)
 * More to come
 
+## Contributing
+```bash
+pip install futures
+pip install --user pipenv
+pipenv install pigar
+pipenv install nose2
+```
+
+
 ## References
 * [NMAP](https://nmap.org/) network discovery and security auditing
