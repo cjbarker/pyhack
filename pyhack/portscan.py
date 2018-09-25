@@ -22,16 +22,21 @@ def valid_ip(ip=None):
     if ip == None:
         return False
     try:
-        if '.' in ip:
-            # handle IPv4
-            socket.inet_pton(socket.AF_INET, ip)
-        elif ':' in ip:
+        if ':' in ip:
             # handle IPv6
             socket.inet_pton(socket.AF_INET6, ip)
+            return True
+        elif '.' in ip:
+            # handle IPv4
+            socket.inet_pton(socket.AF_INET, ip)
+            return True
         else:
-            return False
+            print('None of these ' + ip)
     except socket.error, e:
-        return False
+        # TODO log?
+        pass
+
+    return False
 
 if __name__ == '__main__':
     print('testing')
