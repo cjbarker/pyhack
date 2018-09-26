@@ -111,7 +111,7 @@ def valid_ip(ip=None):
             socket.inet_pton(socket.AF_INET, ip)
             return True
         else:
-            LOGGER.warn("Unrecognized IP - invalid")
+            LOGGER.warn("Invalid and Unrecognized IP - " + ip)
     except socket.error:
         pass # TODO log?
 
