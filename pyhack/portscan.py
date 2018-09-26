@@ -29,6 +29,34 @@ class ScanType(Enum):
     FIN = 6
     XMAS = 7
 
+def resolve_hostname(host=None):
+    """Leverages socket to IP address for a given hostname. If already IP address resolve ignored.
+
+    :param: hostname to resolve
+    :type: str
+    :return: IP address of resolved hostname
+    :rtype: str
+    :raise: socket.gaierror if fails to resolve host
+    """
+    if valid_ip(host):
+        return host
+    try:
+        ip = socket.gethostbyname(host)
+        return ip
+    except socket.gaierror, e:
+        LOGGER.warn("Unable to resolve hostname: " + host)
+        raise e
+
+def valid_port(port=0):
+    """Validates if given network port number is valid for use.
+
+    :param: port number to validate
+    :type: int
+    :return: denotes true if port falls within valid range check
+    :rtype: bool
+    """
+    return (port >= MIN_PORT and port <= MAX_PORT)
+
 def ping_scan(host=None, port=0):
     pass
 
@@ -52,7 +80,7 @@ def scan(scan_type=ScanType.CONNECT, host=None, port=0):
         # TODO throw exception on ports?
         LOGGER.warn("Invalid host or port passed for scan.")
         return
-    # TODO convert host to IP
+    ip = resolve_hostname(host)
     return
 
 def valid_ip(ip=None):

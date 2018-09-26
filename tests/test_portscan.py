@@ -105,6 +105,32 @@ class TestPortScan(unittest.TestCase):
         self.assertTrue(pscan.valid_ip('::255.255.255.255'))
         self.assertTrue(pscan.valid_ip('::ffff:255.255.255.255'))
 
+    def test_resolve_hostname(self):
+        host = 'google.com'
+        try:
+            ip = pscan.resolve_hostname(host)
+            self.assertIsNotNone(host)
+            ip2 = pscan.resolve_hostname(ip)
+            self.assertIsNotNone(ip2)
+            self.assertEqual(ip, ip2)
+        except Error, e:
+            self.fail(e.msg)
+        # test fails
+        try:
+            host = 'google'
+            ip = pscan.resolve_hostname(host)
+            self.fail("Should not be able to resolve " + host)
+        except:
+            pass
+
+    def test_valid_port(self):
+        self.assertTrue(pscan.valid_port(pscan.MIN_PORT))
+        self.assertTrue(pscan.valid_port(pscan.MAX_PORT))
+        self.assertFalse(pscan.valid_port(pscan.MIN_PORT-1))
+        self.assertFalse(pscan.valid_port(pscan.MAX_PORT+1))
+        self.assertFalse(pscan.valid_port(-1234))
+        self.assertFalse(pscan.valid_port(None))
+
     def test_nmap_scan(self):
         # validate server running an connect
         client = Client(self.HOST, self.PORT)
