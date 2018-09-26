@@ -12,12 +12,15 @@ import logging
 import sys
 import socket
 
+import pyhack.log as log
+
 # Globals
 MIN_PORT = 1
 MAX_PORT = 65535
-LOGGER = logging.getLogger()
+LOGGER = log.get_logger("portscan")
 
 class ScanType(Enum):
+    """Port scan types defined and supported."""
     ALL = 1
     PING = 2
     HALF_OPEN = 3
@@ -50,12 +53,6 @@ def scan(scan_type=ScanType.CONNECT, host=None, port=0):
         LOGGER.warn("Invalid host or port passed for scan.")
         return
     # TODO convert host to IP
-    '''
-    nmScan = nmapPortScanner()
-    nmScan.scan(host, port)
-    state = nmScan[host]['tcp'][int(port)]['state']
-    print("[*] " + host + " tcp/" + port + " " + state)
-    '''
     return
 
 def valid_ip(ip=None):
