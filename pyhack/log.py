@@ -47,6 +47,7 @@ def get_logger(logger_name, logging_level=logging.DEBUG, rotate_file=False):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging_level)
     logger.addHandler(get_console_handler())
-    if rotate_file: logger.addHandler(get_file_handler())
+    if rotate_file:
+        logger.addHandler(get_file_handler())
     logger.propagate = False    # rarely necessary to propage the error up to parent
     return logger
