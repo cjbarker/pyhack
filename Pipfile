@@ -6,8 +6,9 @@ name = "pypi"
 [dev-packages]
 
 [packages]
-python-nmap = "==0.6.1"
 pylint = "*"
+scapy = "*"
+sphinx = "*"
 
 [requires]
 python_version = "2.7"
