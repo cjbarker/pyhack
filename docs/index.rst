@@ -10,7 +10,8 @@ Welcome to pyhack's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   module
+   portscan
+   log
    support
 
 
