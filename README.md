@@ -45,6 +45,10 @@ pipenv run nose2
 
 # linting
 pipenv run pylint pyhack -d C0326 --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
+
+# generate docs via Sphinx
+cd docs
+make clean; make html
 ```
 
 ## References
