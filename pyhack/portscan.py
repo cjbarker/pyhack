@@ -20,7 +20,22 @@ MAX_PORT = 65535
 LOGGER = log.get_logger("portscan")
 
 class ScanType(Enum):
-    """Port scan types defined and supported."""
+    """Port scan types defined and supported.
+
+        ALL - Indicates ALL types of port scans.
+
+        PING - Indicates a PING aka ICMP UDP scan.
+
+        HALF_OPEN - Indicates a half open aka TCP SYNC scan.
+
+        CONNECT - Indicates a full connect TCP Connect scan.
+
+        NULL - Indicates a null flag packet TCP scan.
+
+        FIN - indicates a FIN flag packet TCP scan.
+
+        XMAS - indicates all FULL flag packet TCP scan.
+    """
     ALL = 1
     PING = 2
     HALF_OPEN = 3
@@ -96,7 +111,7 @@ def valid_ip(ip=None):
             socket.inet_pton(socket.AF_INET, ip)
             return True
         else:
-            print('None of these ' + ip)
+            LOGGER.warn("Unrecognized IP - invalid")
     except socket.error:
         pass # TODO log?
 
