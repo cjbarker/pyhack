@@ -10,8 +10,14 @@ build:
   image: registry.${APP_REPO}:latest
   stage: build
   script:
+    - rm -rf sdist
     - pipenv sync
     - pipenv run pylint pyhack -d W --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
+    - python setup.py sdist
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 2 weeks
 
 test:
   image: registry.${APP_REPO}:latest
