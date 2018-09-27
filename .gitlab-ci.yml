@@ -12,7 +12,9 @@ build:
   script:
     - rm -rf sdist
     - pipenv sync
-    - pipenv run pylint pyhack -d W --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
+    # Invalid yaml in --msg-template fix later
+    #- pipenv run pylint pyhack -d W --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
+    - pipenv run pylint pyhack -d W
     - python setup.py sdist
   artifacts:
     paths:
