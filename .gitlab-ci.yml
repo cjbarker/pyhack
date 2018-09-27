@@ -6,13 +6,11 @@ stages:
 variables:
   APP_REPO: "gitlab.com/cjbarker/pyhack"
 
-before_script:
-  - pipenv sync
-
 build:
   image: registry.${APP_REPO}:latest
   stage: build
   script:
+    - pipenv sync
     - pipenv run pylint pyhack -d W
 
 test:
