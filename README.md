@@ -29,7 +29,7 @@ python setup.py sdist
 ```
 
 ## Tools
-* [PORTSCAN](./pyhack/portscan): Multi-threaded port scanner leveraging [NMAP](https://nmap.org/)
+* [PORTSCAN](./pyhack/portscan): Multi-threaded port scanner 
 * More to come
 
 ## Contributing
@@ -55,6 +55,3 @@ pipenv run pylint pyhack -d C0326 --msg-template='{path}:{line}: [{msg_id}({symb
 cd docs
 make clean; make html
 ```
-
-## References
-* [NMAP](https://nmap.org/) network discovery and security auditing
