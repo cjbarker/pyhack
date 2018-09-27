@@ -1,0 +1,44 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  APP_REPO: "gitlab.com/cjbarker/pyhack"
+
+before_script:
+  - pipenv sync
+
+build:
+  image: registry.${APP_REPO}:latest
+  stage: build
+  script:
+    - pipenv run pylint pyhack -d W
+
+test:
+  image: registry.${APP_REPO}:latest
+  stage: test
+  script:
+    - coverage erase
+    - coverage run -source pyhack -m nose2
+    - coverage html
+  artifacts:
+    paths:
+      - htmlcov/
+    expire_in: 2 weeks
+
+pages:
+  image: alpine:latest
+  stage: deploy
+  script:
+    # update pages with latest coverage report
+    - cd ${CI_PROJECT_DIR}
+    - mkdir .public
+    - cp -R htmlcov/* .public
+    - mv .public public
+  artifacts:
+    paths:
+    - public
+    expire_in: 30 days
+  only:
+    - master
