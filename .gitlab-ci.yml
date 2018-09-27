@@ -19,6 +19,9 @@ test:
   script:
     - coverage erase
     - coverage run --source pyhack -m nose2
+    # needed for CI badge to grab
+    - coverage report
+    # produce for hosting report
     - coverage html
   artifacts:
     paths:
