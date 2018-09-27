@@ -26,7 +26,7 @@ test:
     expire_in: 2 weeks
 
 pages:
-  image: alpine:latest
+  image: registry.${APP_REPO}:latest
   stage: deploy
   script:
     # update pages with latest coverage report
