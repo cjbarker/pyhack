@@ -2,7 +2,7 @@
 
 [![pipeline status](https://gitlab.com/cjbarker/pyhack/badges/master/pipeline.svg)](https://gitlab.com/cjbarker/pyhack/commits/master)
 [![coverage report](https://gitlab.com/cjbarker/pyhack/badges/master/coverage.svg)](https://cjbarker.gitlab.io/pyhack/)
-[![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https;//cjbarker.gitlab.io/pyhack/docs/)
+[![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https://cjbarker.gitlab.io/pyhack/docs/)
 [![GitLab license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://gitlab.com/cjbarker/pyhack/blob/master/LICENSE)
 
 A collection of white-hat custom security tools used for education and ethical testing in a controlled environment.
