@@ -113,8 +113,8 @@ class TestPortScan(unittest.TestCase):
             ip2 = pscan.resolve_hostname(ip)
             self.assertIsNotNone(ip2)
             self.assertEqual(ip, ip2)
-        except Error, e:
-            self.fail(e.msg)
+        except Exception, ex:
+            self.fail(str(ex))
         # test fails
         try:
             host = 'google'

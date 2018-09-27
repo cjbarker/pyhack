@@ -54,13 +54,13 @@ def resolve_hostname(host=None):
     :rtype: str
     :raise: socket.gaierror if fails to resolve host
     """
-    if valid_ip_addr(host):
+    if valid_ip(host):
         return host
     try:
         ip_addr = socket.gethostbyname(host)
         return ip_addr
     except socket.gaierror, err:
-        LOGGER.warn("Unable to resolve hostname: %s", host)
+        LOGGER.warn("Unable to resolve hostname: %s due to error: %s", host, str(err))
         raise err
 
 def valid_port(port=0):
@@ -164,7 +164,7 @@ def scan(scan_type=ScanType.CONNECT, host=None, port=0):
         xmas_scan(host, port)
     return
 
-def valid_ip_addr(ip_addr=None):
+def valid_ip(ip_addr=None):
     """Validates IP address is valid version 4 or 6. Will return False if exception raised.
 
     :param: IP address to validate
@@ -186,7 +186,7 @@ def valid_ip_addr(ip_addr=None):
         else:
             LOGGER.warn("Invalid and Unrecognized ip_addr, %s", ip_addr)
     except socket.error, err:
-        LOGGER.error("Unable to valid IP address due to %s", err.msg)
+        LOGGER.error("Unable to validate IP addr due to %s", str(err))
     return False
 
 if __name__ == '__main__':
