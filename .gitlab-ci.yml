@@ -11,7 +11,7 @@ build:
   stage: build
   script:
     - pipenv sync
-    - pipenv run pylint pyhack -d W
+    - pipenv run pylint pyhack -d W --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
 
 test:
   image: registry.${APP_REPO}:latest
