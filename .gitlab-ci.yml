@@ -33,8 +33,14 @@ pages:
   script:
     # update pages with latest coverage report
     - cd ${CI_PROJECT_DIR}
-    - mkdir .public
+    - mkdir -p .public/docs
     - cp -R htmlcov/* .public
+    # create docs
+    - cd docs
+    - make clean
+    - make html
+    - cp -R _build/html/* .public/docs
+    # enable live
     - mv .public public
   artifacts:
     paths:
