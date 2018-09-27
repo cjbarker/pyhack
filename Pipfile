@@ -6,9 +6,10 @@ name = "pypi"
 [dev-packages]
 
 [packages]
+"nose2" = "*"
 pylint = "*"
-scapy = "*"
 sphinx = "*"
+scapy = "*"
 
 [requires]
 python_version = "2.7"
