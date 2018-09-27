@@ -37,7 +37,8 @@ pages:
     - cd docs
     - make clean
     - make html
-    - cp -R _build/html/* .public/docs
+    - cp -R _build/html/* ../.public/docs
+    - cd ..
     # enable live
     - mv .public public
   artifacts:
