@@ -20,7 +20,7 @@ test:
   stage: test
   script:
     - coverage erase
-    - coverage run -source pyhack -m nose2
+    - coverage run --source pyhack -m nose2
     - coverage html
   artifacts:
     paths:
