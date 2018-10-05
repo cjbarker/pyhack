@@ -10,6 +10,7 @@ import threading
 
 import pyhack.log as log
 import pyhack.portscan as pscan
+import pyhack.networkutil as net
 
 # Globals
 LOGGER = log.get_logger("test_portscan")
@@ -59,7 +60,7 @@ def getPort():
     :return: port number between 1025 and 65535
     :rtype: int
     """
-    return random.randint(1025, pscan.MAX_PORT)
+    return random.randint(1025, net.MAX_PORT)
 
 class TestPortScan(unittest.TestCase):
 
@@ -89,47 +90,6 @@ class TestPortScan(unittest.TestCase):
     def tearDown(self):
         # TODO shutdown server
         pass
-
-    def test_valid_ip(self):
-        # IPv4
-        self.assertFalse(pscan.valid_ip(None))
-        self.assertFalse(pscan.valid_ip('30.168.1.255.1'))
-        self.assertTrue(pscan.valid_ip('127.0.0.1'))
-        self.assertTrue(pscan.valid_ip('192.168.0.1'))
-        self.assertTrue(pscan.valid_ip('255.255.255.255'))
-        self.assertTrue(pscan.valid_ip('0.0.0.0'))
-        #self.assertTrue(pscan.valid_ip('1.1.1.01'))
-        # IPv6
-        self.assertTrue(pscan.valid_ip('1:2:3:4:5:6:7:8'))
-        self.assertTrue(pscan.valid_ip('2001:db8:3:4::192.0.2.33'))
-        self.assertTrue(pscan.valid_ip('::255.255.255.255'))
-        self.assertTrue(pscan.valid_ip('::ffff:255.255.255.255'))
-
-    def test_resolve_hostname(self):
-        host = 'google.com'
-        try:
-            ip = pscan.resolve_hostname(host)
-            self.assertIsNotNone(host)
-            ip2 = pscan.resolve_hostname(ip)
-            self.assertIsNotNone(ip2)
-            self.assertEqual(ip, ip2)
-        except Exception, ex:
-            self.fail(str(ex))
-        # test fails
-        try:
-            host = 'google'
-            ip = pscan.resolve_hostname(host)
-            self.fail("Should not be able to resolve " + host)
-        except:
-            pass
-
-    def test_valid_port(self):
-        self.assertTrue(pscan.valid_port(pscan.MIN_PORT))
-        self.assertTrue(pscan.valid_port(pscan.MAX_PORT))
-        self.assertFalse(pscan.valid_port(pscan.MIN_PORT-1))
-        self.assertFalse(pscan.valid_port(pscan.MAX_PORT+1))
-        self.assertFalse(pscan.valid_port(-1234))
-        self.assertFalse(pscan.valid_port(None))
 
     def test_nmap_scan(self):
         # validate server running an connect
