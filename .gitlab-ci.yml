@@ -14,7 +14,7 @@ build:
     - pipenv sync
     # Invalid yaml in --msg-template fix later
     #- pipenv run pylint pyhack -d W --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
-    - pipenv run pylint pyhack -d W
+    - pipenv run pylint pyhack -d W,E
     - python setup.py sdist
   artifacts:
     paths:
