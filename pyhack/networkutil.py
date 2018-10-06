@@ -7,7 +7,8 @@
 from __future__ import print_function
 
 import socket
-from scapy.all import IP
+from scapy.all import *
+from scapy.all import IP, UDP, TCP
 
 import pyhack.log as log
 
@@ -15,7 +16,42 @@ import pyhack.log as log
 MIN_PORT = 1
 MAX_PORT = 65535
 
+# Globals
 LOGGER = log.get_logger("networkutil")
+
+TCP_FLAGS = {
+    'F': 'FIN',
+    'S': 'SYN',
+    'R': 'RST',
+    'P': 'PSH',
+    'A': 'ACK',
+    'U': 'URG',
+    'E': 'ECE',
+    'C': 'CWR',
+}
+
+class ValidationError(Exception):
+    """Custom validation exception for error handling in creating scapy packets"""
+    def __init__(self, message, errors):
+        super(ValidationError, self).__init__(message)
+        self.errors = errors
+
+def valid_flags(flags=None):
+    if flags == None or flags == "":
+        return True
+    flags = flags.strip().upper()
+    try:
+        convert_flags(flags)
+        return True
+    except KeyError:
+        return False
+    
+def convert_flags(flags=None):
+    """Converts string of TCP flags of single chars to list of 3 letter value describing the flag."""
+    if flags == None or flags == "":
+        return 
+    flags = flags.strip().upper()
+    return [TCP_FLAGS[x] for x in flags]
 
 def valid_port(port=0):
     """Validates if given network port number is valid for use.
@@ -71,28 +107,44 @@ def resolve_hostname(host=None):
         LOGGER.warn("Unable to resolve hostname: %s due to error: %s", host, str(err))
         raise err
 
-# src_ip, dst_ip, sport, dport
-# Protocol and flags denotes for TCP
-def __create_ip(tcp_udp="tcp", flags=None, **kwargs):
-    # TODO src IP and port not required
+def create_packets(is_tcp=True, flags=None, **kwargs):
+    """Creates IP and associated TCP or UDP corresponding packets via Scapy"""
+    errors = {}
+    if flags and not valid_flags(flags):
+        errors["tcp_flags"] = "Invalid TCP flag(s): " + flags
     if 'dport' in kwargs and not valid_port(kwargs.get("dport")):
-        # TODO raise error?
-        pass
+        errors["dport"] = "Invalid destination port " + str(kwargs.get("dport"))
     if 'sport' in kwargs and not valid_port(kwargs.get("sport")):
-        # TODO raise error?
-        pass
-    if 'src_ip' in kwargs and not valid_ip(kwargs.get("src_ip")):
-        # TODO raise error?
-        pass
-    if 'dst_ip' in kwargs and not valid_ip(kwargs.get("dst_ip")):
-        # TODO raise error?
-        pass
-    if tcp_udp != 'tcp' and tcp_udp != 'udp':
-        # TODO raise error
-        pass
-    if flags and tcp_udp == 'tcp':
-        # TODO raise error cannot pass flags for UDP
-        pass
-    # TODO create/wrap UDP or TCP?
-    s_ip = IP(src=kwargs.get("src_ip"), dst=kwargs.get("dst_ip"))
-    return s_ip
+        errors["sport"] = "Invalid source port " + str(kwargs.get("sport"))
+    if 'src' in kwargs and not valid_ip(kwargs.get("src")):
+        errors["src"] = "Invalid source IP address " + kwargs.get("src")
+    if 'dst' in kwargs and not valid_ip(kwargs.get("dst")):
+        errors["dst"] = "Invalid destination IP address " + kwargs.get("dst")
+    if not 'dst' in kwargs:
+        errors["dst"] = "Destination IP address required"
+    if flags and not is_tcp:
+        errors["udp_flags"] = "Invalid flags cannot be passed for UDP message" 
+    if is_tcp and not 'dport' in kwargs:
+        errors["tcp_dport"] = "Destination port required for TCP packet" 
+    if len(errors) > 0:
+        raise ValidationError("Invalid IP creation", errors)
+
+    # create scapy packet(s)
+    ip_packet = IP(dst=kwargs.get("dst"))
+    if 'src' in kwargs:
+        ip_packet.src = kwargs.get("src")
+    LOGGER.debug("TCP setting is " + flags)
+    if is_tcp:
+        tcp_packet = TCP(dport=int(kwargs.get("dport")))
+        if 'sport' in kwargs:
+            tcp_packet.sport = int(kwargs.get("sport"))
+        tcp_packet.flags = flags   
+        packets = ip_packet/tcp_packet
+    else:
+        udp_packet = UDP(dport=int(kwargs.get("dport")))
+        if 'sport' in kwargs:
+            udp_packet.sport = int(kwargs.get("sport"))
+        packets = ip_packet/udp_packet
+
+    LOGGER.debug(packets.show())
+    return packets

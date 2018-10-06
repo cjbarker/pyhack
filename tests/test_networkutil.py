@@ -7,6 +7,7 @@ import random
 import socket
 import time
 import threading
+from scapy.all import *
 
 import pyhack.log as log
 import pyhack.networkutil as net
@@ -15,6 +16,33 @@ import pyhack.networkutil as net
 LOGGER = log.get_logger("test_networkutil")
 
 class TestNetworkUtil(unittest.TestCase):
+
+    def test_valid_flags(self):
+        # Good flags
+        flags = ""
+        for key, value in net.TCP_FLAGS.iteritems():
+            self.assertTrue(net.valid_flags(str(key)))
+            flags += str(key)
+        self.assertTrue(net.valid_flags(flags))
+        self.assertTrue(net.valid_flags("   "))
+        # Bad flags
+        self.assertFalse(net.valid_flags("zoo"))
+        self.assertFalse(net.valid_flags("HaPpY"))
+
+    def test_convert_flags(self):
+        # Good flags
+        try:
+            flags = net.convert_flags("SAPU")
+            self.assertEqual(len(flags), 4)
+            print(flags)
+        except KeyError, ex:
+            self.fail(str(ex))
+        # bad flags
+        try:
+            flags = net.convert_flags("SAPUZ")
+            self.fail("Should not be able to convert invalid flags")
+        except KeyError, ex:
+            pass
 
     def test_valid_ip(self):
         # IPv4
@@ -56,6 +84,42 @@ class TestNetworkUtil(unittest.TestCase):
         self.assertFalse(net.valid_port(net.MAX_PORT+1))
         self.assertFalse(net.valid_port(-1234))
         self.assertFalse(net.valid_port(None))
+
+    def test_create_packets(self):
+        # bad packets
+        try:
+            # dest ip, dest port required
+            net.create_packets(True, "AF")
+            self.fail("Invalid packet - should not be able to create")
+        except net.ValidationError, ex:
+            self.assertTrue('dst' in ex.errors)
+            self.assertTrue('tcp_dport' in ex.errors)
+        try:
+            # invalid protocol and flags
+            net.create_packets(False, "ZOO")
+            self.fail("Invalid packet - should not be able to create")
+        except net.ValidationError, ex:
+            self.assertTrue('udp_flags' in ex.errors)
+            self.assertTrue('tcp_flags' in ex.errors)
+            self.assertTrue('dst' in ex.errors)
+        try:
+            # invalid IPs and Ports
+            net.create_packets(True, "A", dport=90000, sport=-230, dst="as..dk...", src="0981.1091.111.1") 
+            self.fail("Invalid packet - should not be able to create")
+        except net.ValidationError, ex:
+            self.assertTrue('dport' in ex.errors)
+            self.assertTrue('sport' in ex.errors)
+            self.assertTrue('dst' in ex.errors)
+            self.assertTrue('src' in ex.errors)
+
+        # good packets
+        try:
+            packets = net.create_packets(True, "FA", dport=80, dst="198.1.1.101")
+            output = packets.show()
+            #self.assertTrue("proto = tcp" in output)
+            self.assertTrue("flags = FA" in output)
+        except net.ValidationError, ex:
+            self.fail(ex.message)
 
 if __name__ == "__main__":
     unittest.main()
