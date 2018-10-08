@@ -10,6 +10,7 @@ Welcome to pyhack's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   networkutil
    portscan
    log
    support

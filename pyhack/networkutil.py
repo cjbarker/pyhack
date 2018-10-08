@@ -29,6 +29,24 @@ TCP_FLAGS = {
     'E': 'ECE',
     'C': 'CWR',
 }
+"""TCP packet flags
+
+    F, FIN - Finish/finalize last packet from sender
+
+    S, SYN - Synchronize sequence numbers
+
+    R, RST - Reset connection
+
+    P, PSH - Push function
+
+    A, ACK - Acknowledgement
+
+    U, URG - Urgent pointer field
+
+    E, ECE - ECN-Echo indicates SYN flag set or cleared depending on if ECN capable peer
+
+    C, CWR - Congestion Window Reduced
+"""
 
 class ValidationError(Exception):
     """Custom validation exception for error handling in creating scapy packets"""

@@ -4,3 +4,4 @@ dist/
 _build/
 htmlcov/
 .coverage
+.DS_Store
