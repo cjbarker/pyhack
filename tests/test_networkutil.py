@@ -115,9 +115,8 @@ class TestNetworkUtil(unittest.TestCase):
         # good packets
         try:
             packets = net.create_packets(True, "FA", dport=80, dst="198.1.1.101")
-            output = packets.show()
-            #self.assertTrue("proto = tcp" in output)
-            self.assertTrue("flags = FA" in output)
+            output = packets.summary()
+            self.assertTrue("FA" in output)
         except net.ValidationError, ex:
             self.fail(ex.message)
 
