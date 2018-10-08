@@ -60,7 +60,7 @@ def convert_flags(flags=None):
     :param: flags to convert to list
     :type: str
     :return: sequence of TCP flags code converted to 3 character string prefix
-    :rtype: list 
+    :rtype: list
     """
     if flags is None or flags == "":
         return None
