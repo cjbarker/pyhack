@@ -37,7 +37,8 @@ class ValidationError(Exception):
         self.errors = errors
 
 def valid_flags(flags=None):
-    if flags == None or flags == "":
+    """Validates TCP packet flags."""
+    if flags is None or flags == "":
         return True
     flags = flags.strip().upper()
     try:
@@ -45,11 +46,12 @@ def valid_flags(flags=None):
         return True
     except KeyError:
         return False
-    
+
 def convert_flags(flags=None):
-    """Converts string of TCP flags of single chars to list of 3 letter value describing the flag."""
-    if flags == None or flags == "":
-        return 
+    """Converts string of TCP flags of single chars to list of 3 letter value
+    describing the flag."""
+    if flags is None or flags == "":
+        return None
     flags = flags.strip().upper()
     return [TCP_FLAGS[x] for x in flags]
 
@@ -120,13 +122,13 @@ def create_packets(is_tcp=True, flags=None, **kwargs):
         errors["src"] = "Invalid source IP address " + kwargs.get("src")
     if 'dst' in kwargs and not valid_ip(kwargs.get("dst")):
         errors["dst"] = "Invalid destination IP address " + kwargs.get("dst")
-    if not 'dst' in kwargs:
+    if 'dst' not in kwargs:
         errors["dst"] = "Destination IP address required"
     if flags and not is_tcp:
-        errors["udp_flags"] = "Invalid flags cannot be passed for UDP message" 
-    if is_tcp and not 'dport' in kwargs:
-        errors["tcp_dport"] = "Destination port required for TCP packet" 
-    if len(errors) > 0:
+        errors["udp_flags"] = "Invalid flags cannot be passed for UDP message"
+    if is_tcp and 'dport' not in kwargs:
+        errors["tcp_dport"] = "Destination port required for TCP packet"
+    if errors:
         raise ValidationError("Invalid IP creation", errors)
 
     # create scapy packet(s)
@@ -138,7 +140,7 @@ def create_packets(is_tcp=True, flags=None, **kwargs):
         tcp_packet = TCP(dport=int(kwargs.get("dport")))
         if 'sport' in kwargs:
             tcp_packet.sport = int(kwargs.get("sport"))
-        tcp_packet.flags = flags   
+        tcp_packet.flags = flags
         packets = ip_packet/tcp_packet
     else:
         udp_packet = UDP(dport=int(kwargs.get("dport")))
