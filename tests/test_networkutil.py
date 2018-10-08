@@ -85,18 +85,18 @@ class TestNetworkUtil(unittest.TestCase):
         self.assertFalse(net.valid_port(-1234))
         self.assertFalse(net.valid_port(None))
 
-    def test_create_packets(self):
+    def test_create_packet(self):
         # bad packets
         try:
             # dest ip, dest port required
-            net.create_packets(True, "AF")
+            net.create_packet(True, "AF")
             self.fail("Invalid packet - should not be able to create")
         except net.ValidationError, ex:
             self.assertTrue('dst' in ex.errors)
             self.assertTrue('tcp_dport' in ex.errors)
         try:
             # invalid protocol and flags
-            net.create_packets(False, "ZOO")
+            net.create_packet(False, "ZOO")
             self.fail("Invalid packet - should not be able to create")
         except net.ValidationError, ex:
             self.assertTrue('udp_flags' in ex.errors)
@@ -104,7 +104,7 @@ class TestNetworkUtil(unittest.TestCase):
             self.assertTrue('dst' in ex.errors)
         try:
             # invalid IPs and Ports
-            net.create_packets(True, "A", dport=90000, sport=-230, dst="as..dk...", src="0981.1091.111.1") 
+            net.create_packet(True, "A", dport=90000, sport=-230, dst="as..dk...", src="0981.1091.111.1") 
             self.fail("Invalid packet - should not be able to create")
         except net.ValidationError, ex:
             self.assertTrue('dport' in ex.errors)
@@ -114,8 +114,8 @@ class TestNetworkUtil(unittest.TestCase):
 
         # good packets
         try:
-            packets = net.create_packets(True, "FA", dport=80, dst="198.1.1.101")
-            output = packets.summary()
+            packet = net.create_packet(True, "FA", dport=80, dst="198.1.1.101")
+            output = packet.summary()
             self.assertTrue("FA" in output)
         except net.ValidationError, ex:
             self.fail(ex.message)

@@ -139,14 +139,14 @@ def resolve_hostname(host=None):
         LOGGER.warn("Unable to resolve hostname: %s due to error: %s", host, str(err))
         raise err
 
-def create_packets(is_tcp=True, flags=None, **kwargs):
-    """Creates IP and associated TCP or UDP corresponding packets via Scapy
+def create_packet(is_tcp=True, flags=None, **kwargs):
+    """Creates network packet of  IP and associated TCP or UDP corresponding packets via Scapy
 
     :param: is_tcp denotes if TCP otherwise UDP packet will be created
     :type: bool
     :param: flags TCP flags to enabel in packet, ex: 'AFS'
     :type: str
-    :return: scapy packets
+    :return: scapy packet
     :rtype: pkt
     :raise: ValidationError if method parameter validation fails
     """
@@ -170,22 +170,23 @@ def create_packets(is_tcp=True, flags=None, **kwargs):
     if errors:
         raise ValidationError("Invalid IP creation", errors)
 
-    # create scapy packet(s)
-    ip_packet = IP(dst=kwargs.get("dst"))
+    # create scapy packet
+    # pylint: disable=invalid-name
+    ip = IP(dst=kwargs.get("dst"))
     if 'src' in kwargs:
-        ip_packet.src = kwargs.get("src")
+        ip.src = kwargs.get("src")
     LOGGER.debug("TCP setting is " + flags)
     if is_tcp:
-        tcp_packet = TCP(dport=int(kwargs.get("dport")))
+        tcp = TCP(dport=int(kwargs.get("dport")))
         if 'sport' in kwargs:
-            tcp_packet.sport = int(kwargs.get("sport"))
-        tcp_packet.flags = flags
-        packets = ip_packet/tcp_packet
+            tcp .sport = int(kwargs.get("sport"))
+        tcp.flags = flags
+        packet = ip/tcp
     else:
-        udp_packet = UDP(dport=int(kwargs.get("dport")))
+        udp = UDP(dport=int(kwargs.get("dport")))
         if 'sport' in kwargs:
-            udp_packet.sport = int(kwargs.get("sport"))
-        packets = ip_packet/udp_packet
+            udp.sport = int(kwargs.get("sport"))
+        packet = ip/udp
 
-    LOGGER.debug(packets.show())
-    return packets
+    LOGGER.debug(packet.show())
+    return packet
