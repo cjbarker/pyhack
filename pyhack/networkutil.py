@@ -8,7 +8,7 @@ from __future__ import print_function
 
 import socket
 from scapy.all import *
-from scapy.all import IP, UDP, TCP
+from scapy.all import Ether, IP, UDP, TCP
 
 import pyhack.log as log
 
@@ -142,10 +142,19 @@ def resolve_hostname(host=None):
 def create_packet(is_tcp=True, flags=None, **kwargs):
     """Creates network packet of  IP and associated TCP or UDP corresponding packets via Scapy
 
+    :param: src_mac denotes if TCP otherwise UDP packet will be created
+    :type: bool
     :param: is_tcp denotes if TCP otherwise UDP packet will be created
     :type: bool
     :param: flags TCP flags to enabel in packet, ex: 'AFS'
     :type: str
+    :param: kwargs dictionary for packet creation
+        src = IP address of source
+        sport = IP source port
+        dst = IP address of destination
+        dport = IP destination port
+        src_mac = Ethernet MAC address of source
+    :rtype: dict
     :return: scapy packet
     :rtype: pkt
     :raise: ValidationError if method parameter validation fails
@@ -175,18 +184,26 @@ def create_packet(is_tcp=True, flags=None, **kwargs):
     ip = IP(dst=kwargs.get("dst"))
     if 'src' in kwargs:
         ip.src = kwargs.get("src")
-    LOGGER.debug("TCP setting is " + flags)
+        LOGGER.debug("Set Src IP " + ip.src)
     if is_tcp:
         tcp = TCP(dport=int(kwargs.get("dport")))
         if 'sport' in kwargs:
             tcp .sport = int(kwargs.get("sport"))
         tcp.flags = flags
+        LOGGER.debug("Set TCP Flags " + str(tcp.flags))
         packet = ip/tcp
     else:
         udp = UDP(dport=int(kwargs.get("dport")))
+        LOGGER.debug("Set UDP Dest Port " + str(udp.dport))
         if 'sport' in kwargs:
             udp.sport = int(kwargs.get("sport"))
+            LOGGER.debug("Set UDP Src Port " + str(udp.sport))
         packet = ip/udp
+
+    if 'src_mac' in kwargs:
+        ether = Ether(src=kwargs.get("src_mac"))
+        LOGGER.debug("Set Ethernet MAC Addr " + ether.src)
+        packet = ether/packet
 
     LOGGER.debug(packet.show())
     return packet

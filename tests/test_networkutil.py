@@ -119,6 +119,16 @@ class TestNetworkUtil(unittest.TestCase):
             self.assertTrue("FA" in output)
         except net.ValidationError, ex:
             self.fail(ex.message)
+        try:
+            mac = "ff:ff:ff:ff:ff:ff"
+            packet = net.create_packet(True, "FA", dport=80, dst="198.1.1.101", src_mac=mac)
+            self.assertEqual(mac, packet[Ether].src)
+        except net.ValidationError, ex:
+            self.fail(ex.message)
+
+if __name__ == "__main__":
+    unittest.main()
+
 
 if __name__ == "__main__":
     unittest.main()
