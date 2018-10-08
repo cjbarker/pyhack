@@ -37,7 +37,13 @@ class ValidationError(Exception):
         self.errors = errors
 
 def valid_flags(flags=None):
-    """Validates TCP packet flags."""
+    """Validates TCP packet flags
+
+    :param: flags to validate
+    :type: str
+    :return: denotes true if flags are valid TCP falgs
+    :rtype: bool
+    """
     if flags is None or flags == "":
         return True
     flags = flags.strip().upper()
@@ -49,7 +55,13 @@ def valid_flags(flags=None):
 
 def convert_flags(flags=None):
     """Converts string of TCP flags of single chars to list of 3 letter value
-    describing the flag."""
+    describing the flag.
+
+    :param: flags to convert to list
+    :type: str
+    :return: sequence of TCP flags code converted to 3 character string prefix
+    :rtype: list 
+    """
     if flags is None or flags == "":
         return None
     flags = flags.strip().upper()
@@ -110,7 +122,16 @@ def resolve_hostname(host=None):
         raise err
 
 def create_packets(is_tcp=True, flags=None, **kwargs):
-    """Creates IP and associated TCP or UDP corresponding packets via Scapy"""
+    """Creates IP and associated TCP or UDP corresponding packets via Scapy
+
+    :param: is_tcp denotes if TCP otherwise UDP packet will be created
+    :type: bool
+    :param: flags TCP flags to enabel in packet, ex: 'AFS'
+    :type: str
+    :return: scapy packets
+    :rtype: pkt
+    :raise: ValidationError if method parameter validation fails
+    """
     errors = {}
     if flags and not valid_flags(flags):
         errors["tcp_flags"] = "Invalid TCP flag(s): " + flags
