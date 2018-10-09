@@ -17,6 +17,17 @@ LOGGER = log.get_logger("test_networkutil")
 
 class TestNetworkUtil(unittest.TestCase):
 
+    def test_valid_mac(self):
+        self.assertFalse(net.valid_mac(None))
+        self.assertFalse(net.valid_mac("   "))
+        self.assertFalse(net.valid_mac(" hello  "))
+        self.assertTrue(net.valid_mac("01:02:03:04:ab:cd"))
+        self.assertTrue(net.valid_mac("    01:02:03:04:ab:cd "))
+        self.assertTrue(net.valid_mac("01-02-03-04-ab-cd"))
+        self.assertTrue(net.valid_mac("01.02.03.04.ab.cd"))
+        self.assertTrue(net.valid_mac("0102-0304-abcd"))
+        self.assertTrue(net.valid_mac("01020304abcd"))
+
     def test_valid_flags(self):
         # Good flags
         flags = ""
@@ -125,10 +136,6 @@ class TestNetworkUtil(unittest.TestCase):
             self.assertEqual(mac, packet[Ether].src)
         except net.ValidationError, ex:
             self.fail(ex.message)
-
-if __name__ == "__main__":
-    unittest.main()
-
 
 if __name__ == "__main__":
     unittest.main()

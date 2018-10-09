@@ -7,6 +7,7 @@
 from __future__ import print_function
 
 import socket
+import re
 from scapy.all import *
 from scapy.all import Ether, IP, UDP, TCP
 
@@ -53,6 +54,19 @@ class ValidationError(Exception):
     def __init__(self, message, errors):
         super(ValidationError, self).__init__(message)
         self.errors = errors
+
+def valid_mac(mac=None):
+    """Validates Ethernet MAC Address
+
+    :param: mac address to validate
+    :type: str
+    :return: denotes true if MAC proper format else flase
+    :rtype: bool
+    """
+    if mac is None or mac.strip() == "":
+        return False
+    mac = mac.strip()
+    return re.match("^([0-9A-Fa-f]{2}[:.-]?){5}([0-9A-Fa-f]{2})$", mac)
 
 def valid_flags(flags=None):
     """Validates TCP packet flags
@@ -170,6 +184,8 @@ def create_packet(is_tcp=True, flags=None, **kwargs):
         errors["src"] = "Invalid source IP address " + kwargs.get("src")
     if 'dst' in kwargs and not valid_ip(kwargs.get("dst")):
         errors["dst"] = "Invalid destination IP address " + kwargs.get("dst")
+    if 'src_mac' in kwargs and not valid_mac(kwargs.get("src_mac")):
+        errors["src_mac"] = "Invalid source MAC address " + kwargs.get("src_mac")
     if 'dst' not in kwargs:
         errors["dst"] = "Destination IP address required"
     if flags and not is_tcp:
