@@ -8,8 +8,10 @@ from __future__ import print_function
 
 import socket
 import re
+from enum import Enum
+
 from scapy.all import *
-from scapy.all import Ether, IP, UDP, TCP
+from scapy.all import Ether, IP, UDP, TCP, ICMP
 
 import pyhack.log as log
 
@@ -48,6 +50,19 @@ TCP_FLAGS = {
 
     C, CWR - Congestion Window Reduced
 """
+
+class PacketProto(Enum):
+    """Packet protocol defined for use in packet creation within scapy
+
+        TCP - Indicates TCP packet layer
+
+        UDP - Indicates UDP packet layer
+
+        ICMP - Indicates ICMP packet layer
+    """
+    TCP = 1
+    UDP = 2
+    ICMP = 3
 
 class ValidationError(Exception):
     """Custom validation exception for error handling in creating scapy packets"""
@@ -153,13 +168,11 @@ def resolve_hostname(host=None):
         LOGGER.warn("Unable to resolve hostname: %s due to error: %s", host, str(err))
         raise err
 
-def create_packet(is_tcp=True, flags=None, **kwargs):
+def create_packet(packet_proto=PacketProto.TCP, **kwargs):
     """Creates network packet of  IP and associated TCP or UDP corresponding packets via Scapy
 
-    :param: src_mac denotes if TCP otherwise UDP packet will be created
-    :type: bool
-    :param: is_tcp denotes if TCP otherwise UDP packet will be created
-    :type: bool
+    :param: packet_proto denotes IP packet layer (protocol) to create, ex: TCP, UDP, ICMP
+    :type: PacketProto
     :param: flags TCP flags to enabel in packet, ex: 'AFS'
     :type: str
     :param: kwargs dictionary for packet creation
@@ -174,8 +187,10 @@ def create_packet(is_tcp=True, flags=None, **kwargs):
     :raise: ValidationError if method parameter validation fails
     """
     errors = {}
-    if flags and not valid_flags(flags):
-        errors["tcp_flags"] = "Invalid TCP flag(s): " + flags
+    if 'flags' in kwargs and not valid_flags(kwargs.get('flags')):
+        errors["tcp_flags"] = "Invalid TCP flag(s): " + kwargs.get('flags')
+    if 'flags' in kwargs and packet_proto != PacketProto.TCP:
+        errors["flags"] = "Invalid flags cannot be passed non TCP packet"
     if 'dport' in kwargs and not valid_port(kwargs.get("dport")):
         errors["dport"] = "Invalid destination port " + str(kwargs.get("dport"))
     if 'sport' in kwargs and not valid_port(kwargs.get("sport")):
@@ -188,9 +203,7 @@ def create_packet(is_tcp=True, flags=None, **kwargs):
         errors["src_mac"] = "Invalid source MAC address " + kwargs.get("src_mac")
     if 'dst' not in kwargs:
         errors["dst"] = "Destination IP address required"
-    if flags and not is_tcp:
-        errors["udp_flags"] = "Invalid flags cannot be passed for UDP message"
-    if is_tcp and 'dport' not in kwargs:
+    if packet_proto == PacketProto.TCP and 'dport' not in kwargs:
         errors["tcp_dport"] = "Destination port required for TCP packet"
     if errors:
         raise ValidationError("Invalid IP creation", errors)
@@ -201,20 +214,28 @@ def create_packet(is_tcp=True, flags=None, **kwargs):
     if 'src' in kwargs:
         ip.src = kwargs.get("src")
         LOGGER.debug("Set Src IP " + ip.src)
-    if is_tcp:
+
+    if packet_proto == PacketProto.TCP:
         tcp = TCP(dport=int(kwargs.get("dport")))
         if 'sport' in kwargs:
             tcp .sport = int(kwargs.get("sport"))
-        tcp.flags = flags
+        tcp.flags = kwargs.get("flags")
         LOGGER.debug("Set TCP Flags " + str(tcp.flags))
         packet = ip/tcp
-    else:
+    elif packet_proto == PacketProto.UDP:
         udp = UDP(dport=int(kwargs.get("dport")))
         LOGGER.debug("Set UDP Dest Port " + str(udp.dport))
         if 'sport' in kwargs:
             udp.sport = int(kwargs.get("sport"))
             LOGGER.debug("Set UDP Src Port " + str(udp.sport))
         packet = ip/udp
+    elif packet_proto == PacketProto.ICMP:
+        LOGGER.debug("Set ICMP packet")
+        icmp = ICMP()
+        packet = ip/icmp
+    else:
+        errors["packet_proto"] = "Invalid packet protocol passed (unrecognized)"
+        raise ValidationError("Invalid IP creation", errors)
 
     if 'src_mac' in kwargs:
         ether = Ether(src=kwargs.get("src_mac"))

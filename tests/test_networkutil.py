@@ -45,7 +45,6 @@ class TestNetworkUtil(unittest.TestCase):
         try:
             flags = net.convert_flags("SAPU")
             self.assertEqual(len(flags), 4)
-            print(flags)
         except KeyError, ex:
             self.fail(str(ex))
         # bad flags
@@ -100,39 +99,52 @@ class TestNetworkUtil(unittest.TestCase):
         # bad packets
         try:
             # dest ip, dest port required
-            net.create_packet(True, "AF")
+            net.create_packet(net.PacketProto.TCP, flags="AF")
             self.fail("Invalid packet - should not be able to create")
         except net.ValidationError, ex:
             self.assertTrue('dst' in ex.errors)
             self.assertTrue('tcp_dport' in ex.errors)
         try:
             # invalid protocol and flags
-            net.create_packet(False, "ZOO")
+            net.create_packet(net.PacketProto.UDP, flags="ZOO")
             self.fail("Invalid packet - should not be able to create")
         except net.ValidationError, ex:
-            self.assertTrue('udp_flags' in ex.errors)
+            self.assertTrue('flags' in ex.errors)
             self.assertTrue('tcp_flags' in ex.errors)
             self.assertTrue('dst' in ex.errors)
         try:
             # invalid IPs and Ports
-            net.create_packet(True, "A", dport=90000, sport=-230, dst="as..dk...", src="0981.1091.111.1") 
+            net.create_packet(net.PacketProto.TCP, flags="A", dport=90000, sport=-230, dst="as..dk...", src="0981.1091.111.1") 
             self.fail("Invalid packet - should not be able to create")
         except net.ValidationError, ex:
             self.assertTrue('dport' in ex.errors)
             self.assertTrue('sport' in ex.errors)
             self.assertTrue('dst' in ex.errors)
             self.assertTrue('src' in ex.errors)
+        try:
+            # invalid MAC and dst ip
+            net.create_packet(net.PacketProto.UDP, src_mac='foo')
+            self.fail("Invalid packet - should not be able to create")
+        except net.ValidationError, ex:
+            self.assertTrue('dst' in ex.errors)
+            self.assertTrue('src_mac' in ex.errors)
 
         # good packets
         try:
-            packet = net.create_packet(True, "FA", dport=80, dst="198.1.1.101")
+            packet = net.create_packet(net.PacketProto.TCP, flags="FA", dport=80, dst="1.1.1.1")
             output = packet.summary()
             self.assertTrue("FA" in output)
         except net.ValidationError, ex:
             self.fail(ex.message)
         try:
             mac = "ff:ff:ff:ff:ff:ff"
-            packet = net.create_packet(True, "FA", dport=80, dst="198.1.1.101", src_mac=mac)
+            packet = net.create_packet(net.PacketProto.TCP, flags="FA", dport=80, dst="1.1.1.1", src_mac=mac)
+            self.assertEqual(mac, packet[Ether].src)
+        except net.ValidationError, ex:
+            self.fail(ex.message)
+        try:
+            mac = "ff:ff:ff:ff:ff:ff"
+            packet = net.create_packet(net.PacketProto.ICMP, dport=80, dst="1.1.1.1", src_mac=mac)
             self.assertEqual(mac, packet[Ether].src)
         except net.ValidationError, ex:
             self.fail(ex.message)
